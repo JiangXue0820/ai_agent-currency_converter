@@ -1,7 +1,8 @@
 # 🧠 AI Agent Currency Converter
 
 This project implements a simple yet powerful AI agent capable of reasoning and tool usage.
-Given a user query, the agent determines whether calling the currency conversion tool is required. If the query is unrelated to currency, the agent responds directly. If conversion is needed, it retrieves the latest exchange rate and calculates the amount from one currency to another using real-time data.
+Given a user query, the agent determines whether it requires calling the currency conversion tool. If the query is unrelated to currency, the agent responds directly. If conversion is needed, it retrieves the latest exchange rate and calculates the amount from one currency to another using real-time data.
+
 ---
 
 ## 🚀 Features
