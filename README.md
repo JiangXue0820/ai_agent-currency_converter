@@ -4,8 +4,6 @@ This project implements a simple AI agent for currency-related questions.
 
 The agent is capable of reasoning, reflection and tool usage. 
 Given a user query, the agent generates a step-by-step plan to address the request. If the query is unrelated to currency, it responds directly with a natural answer. If currency conversion is required, it retrieves the latest exchange rates and performs the conversion using real-time data. Additionally, a reflection module reviews the initial plan, identifies any errors or inconsistencies, and revises the plan to ensure the final response is accurate and coherent.
-
-Given a user query, the agent determines whether it requires calling the currency conversion tool. If the query is unrelated to currency, the agent responds directly. If conversion is needed, it retrieves the latest exchange rate and calculates the amount from one currency to another using real-time data.
 ---
 
 ## 🚀 Features
