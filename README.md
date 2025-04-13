@@ -27,10 +27,10 @@ pip install -r requirements.txt
 
 ## 🔑 Environment Variables
 
-Create a `.env` file in the root directory with the following content:
+Before running the script, set your API key in the terminal using the export command:
 
-```env
-DEEPSEEK_API_KEY=your_deepseek_api_key
+```bash
+export DEEPSEEK_API_KEY=your_deepseek_api_key
 ```
 
 Replace `your_deepseek_api_key` with your actual OpenAI API key.
