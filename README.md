@@ -69,15 +69,17 @@ You'll be prompted to enter a query directly in the terminal. For example:
 
 ```
 $ python3 run_agent.py
-🧐 AI Agent Currency Converter is ready!
+🧠 AI Agent Currency Converter is ready!
 Type your query below (or type 'exit' to quit):
 
->>> Your query: convert 100 EURO to Malaysian Ringgit
->>> Query processing ...  
->>> Response:  
-Thought: I need to convert 100 Euros to Malaysian Ringgit using the currency conversion tool  
-Plan: Use convert_currency tool to convert 100 EUR to MYR. Return the conversion result  
-Results: 100 EUR = 502.16 MYR  
+>>> Input your query here: Convert 100 EURO to Malaysian Ringgit
+>>> Query processing ... 
+>>> Response:
+- Initial Thought: I need to use the currency conversion tool to convert EURO to Malaysian Ringgit
+- Initial Plan: Use convert_currency tool to convert 100 EURO to MYR. Return the conversion result
+- Reflection: The generated plan is appropriate for the task. The currency conversion tool is correctly chosen for converting EURO (EUR) to Malaysian Ringgit (MYR). The parameters are accurate, and the plan is efficient with a single tool call. No changes are needed.
+- Final Plan: Use convert_currency tool to convert 100 EURO to MYR. Return the conversion result
+- Results: 100 EUR = 502.16 MYR
 --------------------------------------------------
 ```
 
