@@ -1,15 +1,15 @@
 # 🧠 AI Agent Currency Converter
 
-A multi-turn conversational currency converter powered by LangGraph and OpenAI agents. This project demonstrates how to build a conversational AI system that can plan, convert, and validate currency conversion queries step-by-step using tool-augmented reasoning.
+This project implements a simple yet powerful AI agent capable of reasoning and tool usage.
 
+Given a user query, the agent determines whether it requires calling the currency conversion tool. If the query is unrelated to currency, the agent responds directly. If conversion is needed, it retrieves the latest exchange rate and calculates the amount from one currency to another using real-time data.
 ---
 
 ## 🚀 Features
 
 - **Real-time currency conversion** using [exchangerate.host](https://exchangerate.host)
-- **Integrated with DeepSeek Function Calling**
-- **Agent from scratch**: with reasoning, planning, tool-using capabilities
-- **Tool decorator**: flexible for adding new tools
+- **Agent from scratch**: with reasoning, planning, tool execution
+- **Tool decorator** for seamless integration of new tools and functionality
 
 ---
 
