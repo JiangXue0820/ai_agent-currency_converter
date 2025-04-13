@@ -1,20 +1,28 @@
-# 🧠 AI Agent Currency Converter
+# AI Agent Currency Converter
 
-This project implements a simple AI agent for currency-related questions. 
+This agent is equipped with advanced reasoning, reflection, and tool usage capabilities.
 
-The agent is capable of reasoning, reflection and tool usage. 
-Given a user query, the agent generates a step-by-step plan to address the request. If the query is unrelated to currency, it responds directly with a natural answer. If currency conversion is required, it retrieves the latest exchange rates and performs the conversion using real-time data. Additionally, a reflection module reviews the initial plan, identifies any errors or inconsistencies, and revises the plan to ensure the final response is accurate and coherent.
+## 🧠 How It Works
+
+### Step-by-Step Planning
+- For every user query, the agent generates a detailed plan to address the request.
+
+### Response Logic
+- **Non-Currency Queries**:  
+  The agent responds directly with a natural, conversational answer.
+  
+- **Currency Conversion Queries**:  
+  - Retrieves the latest exchange rates using real-time data.  
+  - Performs accurate currency conversion based on the retrieved information.
+
+### 🔍 Reflection Module
+- After the initial plan is generated, a reflection module:
+  - Reviews the reasoning and proposed steps.
+  - Identifies any errors or inconsistencies.
+  - Revises the plan to ensure the final response is both accurate and coherent.
 ---
 
-## 🚀 Features
-
-- **Real-time currency conversion** using [exchangerate.host](https://exchangerate.host)
-- **Agent from scratch**: with reasoning, planning, tool execution
-- **Tool decorator** for seamless integration of new tools and functionality
-- **Working memory** for reading and writing plan reflections (new feature)
----
-
-🔄 Changes from First Version
+## 🔄 Changes from First Version
 In this version, we introduce a reflection module that enables the agent to detect and revise incorrect or suboptimal execution plans.
 
 The agent now performs a self-evaluation step after generating an initial plan.
