@@ -172,8 +172,6 @@ Remember to use tools only when they are actually needed for the task."""
         """Execute the full pipeline: plan and execute tools."""
         
         response = self.get_agent_response(user_query)
-        pprint("Response:")
-        pprint(response)
 
         # If agent decide not to use tools, directly return response    
         if not response.get("requires_tools", True):
@@ -195,10 +193,18 @@ if __name__ == "__main__":
     agent = Agent()
     agent.add_tools(convert_currency)
 
-    query_list = ["I am traveling to Japan from Serbia, I have 1500 of local currency, how much of Japanese currency will I be able to get?",
-                    "How are you doing?"]
+    print("🧠 AI Agent Currency Converter is ready!")
+    print("Type your query below (or type 'exit' to quit):\n")
 
-    for query in query_list:
-        print(f"\nQuery: {query}")
+    while True:
+        query = input(">>> Input your query here: ").strip()
+        
+        if query.lower() in {"exit", "quit"}:
+            print("👋 Goodbye!")
+            break
+
+        print(">>> Query processing ... ")
         result = agent.execute(query)
+        print(">>> Response:")
         print(result)
+        print("-" * 50)
