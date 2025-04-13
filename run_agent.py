@@ -1,9 +1,11 @@
 import os
 from openai import OpenAI
 from pprint import pprint
-from tool_bank import *
-from tool_decorator import *
 from utils import *
+from typing import List, Any
+from modules import Interaction, Tool
+from datetime import datetime
+from tools import convert_currency
 
 class Agent:
     def __init__(self):
@@ -11,6 +13,7 @@ class Agent:
         self.client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com")
         self.tools: dict[str, Tool] = {}
         self.model = 'deepseek-chat'
+        self.interactions: list[Interaction] = [] # working memory, new feature
 
     def add_tools(self, tool: Tool) -> None:
         """Register a new tool with the agent."""
@@ -33,11 +36,13 @@ class Agent:
                 "Using provided tools to help users when necessary",
                 "Responding directly without tools for questions that don't require tool usage",
                 "Planning efficient tool usage sequences"
+                "If asked by the user, reflecting on the plan and suggesting changes if needed"
             ],
             "instructions": [
                 "Use tools only when they are necessary for the task",
                 "If a query can be answered directly, respond with a simple message instead of using tools",
-                "When tools are needed, plan their usage efficiently to minimize tool calls"
+                "When tools are needed, plan their usage efficiently to minimize tool calls",
+                "If asked by the user, reflect on the plan and suggest changes if needed"
             ],
             "tools": [
                 {
@@ -157,36 +162,122 @@ Configuration, instructions, and available tools are provided in JSON format bel
 Always respond with a JSON object following the response_format schema above. 
 Remember to use tools only when they are actually needed for the task."""
     
-    def get_agent_response(self, user_query: str) -> str:
+    def plan(self, user_query: str) -> str:
+        """Given user query, generate execution plans. """
 
         message = [
                 {"role": "system", "content": self.create_system_prompt()},
                 {"role": "user", "content": user_query}
                 ]
         
-        response = call_llm(self.client, message, model=self.model, temperature=0)
-        return extract_json_block(response)
+        plan = extract_json_block(call_llm(self.client, message, model=self.model, temperature=0))  # get the original plan
 
+        # Store the interaction immediately after planning
+        self.interactions.append(Interaction(
+                                    timestamp=datetime.now(),
+                                    query=user_query,
+                                    plan=plan
+                                ))
+        return plan
+    
+    def reflect_on_plan(self) -> dict[str, Any]:
+        """Reflect on the most recent plan using interaction history."""
+        if not self.interactions:
+            return {"reflection": "No plan to reflect on", "requires_changes": False}
+        
+        reflection_prompt = {
+            "task": "reflection",
+            "context": {
+                "user_query": self.interactions[-1].query,
+                "generated_plan": self.interactions[-1].plan
+            },
+            "instructions": [
+                "Review the generated plan for potential improvements",
+                "Consider if the chosen tools are appropriate",
+                "Verify tool parameters are correct",
+                "Check if the plan is efficient",
+                "Determine if tools are actually needed"
+            ],
+            "response_format": {
+                "type": "json",
+                "schema": {
+                    "requires_changes": {
+                        "type": "boolean",
+                        "description": "whether the plan needs modifications"
+                    },
+                    "reflection": {
+                        "type": "string",
+                        "description": "explanation of what changes are needed or why no changes are needed"
+                    },
+                    "suggestions": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "specific suggestions for improvements",
+                        "optional": True
+                    }
+                }
+            }
+        }
+
+        # create a message for querying LLM to reflect the plans
+        message = [
+                    {"role": "system", "content": self.create_system_prompt()},
+                    {"role": "user", "content": json.dumps(reflection_prompt)}
+                ]
+
+        reflection = extract_json_block(call_llm(self.client, message, model=self.model, temperature=0))  # get reflection results
+
+        return reflection
         
     def execute(self, user_query: str) -> str:
         """Execute the full pipeline: plan and execute tools."""
         
-        response = self.get_agent_response(user_query)
+        # Create initial plan (this also stores it in memory)
+        origin_plan = self.plan(user_query)
 
+        # Reflect on the plan using memory
+        reflection = self.reflect_on_plan()
+
+        # Check if reflection suggests changes
+        if reflection.get("requires_changes", False):
+            # Generate new plan based on reflection
+            messages = [
+                {"role": "system", "content": self.create_system_prompt()},
+                {"role": "user", "content": user_query},
+                {"role": "assistant", "content": json.dumps(origin_plan)},
+                {"role": "user", "content": f"Please revise the plan based on this feedback: {json.dumps(reflection)}"}
+            ]
+            
+            final_plan = extract_json_block(call_llm(self.client, messages, model=self.model, temperature=0))  # get reflection results
+        else:
+            final_plan = origin_plan
+
+        # Update the stored interaction with all information
+        self.interactions[-1].plan = {
+                "initial_plan": origin_plan,
+                "reflection": reflection,
+                "final_plan": final_plan
+            }
+        
         # If agent decide not to use tools, directly return response    
-        if not response.get("requires_tools", True):
-            return response["direct_response"]
+        if not final_plan.get("requires_tools", True):
+            return f"""Response: {final_plan['direct_response']}
+            Reflection: {reflection.get('reflection', 'No improvements suggested')}"""        
         
         # Else, excetue tools in sequence:
         results = []
-        for tool_call in response['tool_calls']:
+        for tool_call in final_plan['tool_calls']:
             tool_name = tool_call['tool']
             tool_args = tool_call['args']
             result = self.use_tool(tool_name, **tool_args)
             results.append(result)
 
         # Combine results
-        return f"""Thought: {response['thought']}\nPlan: {'. '.join(response['plan'])}\nResults: {'. '.join(results)}"""          
+        return f"""- Initial Thought: {origin_plan['thought']}
+- Initial Plan: {'. '.join(origin_plan['plan'])}
+- Reflection: {reflection.get('reflection', 'No improvements suggested')}
+- Final Plan: {'. '.join(final_plan['plan'])}
+- Results: {'. '.join(results)}"""
 
             
 if __name__ == "__main__":

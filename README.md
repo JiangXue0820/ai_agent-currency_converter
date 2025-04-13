@@ -1,8 +1,11 @@
 # 🧠 AI Agent Currency Converter
 
-This project implements a simple yet powerful AI agent capable of reasoning and tool usage.
+This project implements a simple AI agent for currency-related questions. 
 
-Given a user query, the agent determines whether it requires calling the currency conversion tool. If the query is unrelated to currency, the agent responds directly. If conversion is needed, it retrieves the latest exchange rate and calculates the amount from one currency to another using real-time data.
+The agent is capable of reasoning, reflection and tool usage. 
+Given a user query, the agent generates a step-by-step plan to address the request. If the query is unrelated to currency, it responds directly with a natural answer. If currency conversion is required, it retrieves the latest exchange rates and performs the conversion using real-time data. Additionally, a reflection module reviews the initial plan, identifies any errors or inconsistencies, and revises the plan to ensure the final response is accurate and coherent.
+
+[source of instruction](https://zhuanlan.zhihu.com/p/25193163645)
 ---
 
 ## 🚀 Features
@@ -10,7 +13,17 @@ Given a user query, the agent determines whether it requires calling the currenc
 - **Real-time currency conversion** using [exchangerate.host](https://exchangerate.host)
 - **Agent from scratch**: with reasoning, planning, tool execution
 - **Tool decorator** for seamless integration of new tools and functionality
+- **Working memory** for reading and writing plan reflections (new feature)
+---
 
+🔄 Changes from First Version
+In this version, we introduce a reflection module that enables the agent to detect and revise incorrect or suboptimal execution plans.
+
+The agent now performs a self-evaluation step after generating an initial plan.
+
+If flaws or inconsistencies are identified, the agent reflects on the previous reasoning and produces a revised version of the plan.
+
+This enhancement builds on the foundation of the original implementation by enabling iterative improvement through feedback and self-correction.
 ---
 
 ## 🛠️ Installation
@@ -68,9 +81,8 @@ Results: 100 EUR = 502.16 MYR
 ```
 ai_agent-currency_converter/
 ├── run_agent.py          # Entry point to run the agent
-├── agent.py              # Agent class and behavior
-├── tool_bank.py          # Tool definitions for conversion
-├── tool_decorator.py     # Decorators for tools
+├── tools.py              # Tool definitions for conversion
+├── modules.py            # Class of modules, including Tool and Interaction (working memory)
 ├── utils.py              # Utility functions
 ├── README.md             # Project documentation
 ```
@@ -88,14 +100,6 @@ Install all dependencies with:
 ```bash
 pip install -r requirements.txt
 ```
-
----
-
-## 🧠 Future Improvements
-
-- Add support for natural language queries like "How much is 50 euros in yen?"
-- Integrate logging and error tracking
-- Improve currency name normalization
 
 ---
 

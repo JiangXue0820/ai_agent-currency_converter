@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable, Any, get_origin, get_args, Literal, get_type_hints
 import inspect
+from datetime import datetime
 
 @dataclass
 class Tool:
@@ -122,3 +123,10 @@ def tool(name: str = None):
             parameters=params
         )
     return decorator
+
+@dataclass
+class Interaction:
+    """Record of a single interaction with the agent"""
+    timestamp: datetime
+    query: str
+    plan: dict[str, Any]
